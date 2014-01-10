@@ -20,10 +20,12 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JDialog;
+import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -146,7 +148,18 @@ public class Installer  extends JFrame {
 		
 		ActionListener fileButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
-				
+				JTextArea output = null;
+				JFileChooser fileChooser = new JFileChooser(); 
+				fileChooser.setDialogTitle(InstallerConstants.INSTALL_PATH_FILE_CHOOSER_TITLE);
+				fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);							
+				fileChooser.setCurrentDirectory(new File("C:\\"));
+				//... Open a file dialog.
+				int retval = fileChooser.showOpenDialog(output);
+				if (retval == JFileChooser.APPROVE_OPTION) {
+					//... The user selected a file, get it, use it.          	
+					File file = fileChooser.getSelectedFile();
+					textField.setText(file.getPath());
+				}
 			}
 		};
 		
