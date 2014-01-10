@@ -22,6 +22,7 @@ import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
@@ -151,9 +152,10 @@ public class Installer  extends JFrame {
 		
 		ActionListener okButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
-				install();
-				setVisible(false);
-				dispose();
+				if (install()) {
+					setVisible(false);
+					dispose();
+				}				
 			}
 		};
 		
@@ -170,15 +172,38 @@ public class Installer  extends JFrame {
 		
 	} 	
 
-	public void install() {
+	public boolean install() {
 		File sourceDir = new File("dist");
 		File destDir = new File(textField.getText());
-		try {
-			copyDirectory(sourceDir, destDir);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		boolean install = true;
+		if (destDir.exists()) {
+			Object[] options = {"    Yes    ", "    No    ",};
+			int choice = JOptionPane.showOptionDialog(null, 
+					InstallerConstants.DIRECTORY_EXISTS_MESSAGE, 
+					InstallerConstants.DIRECTORY_EXISTS_TITLE, 
+					JOptionPane.YES_NO_OPTION, 
+					JOptionPane.QUESTION_MESSAGE, 
+					null, options, options[0]);
+			if (choice == JOptionPane.YES_OPTION) {
+				
+			}
+			// set old equation
+			if (choice == JOptionPane.NO_OPTION) {
+				install = false;
+				return false;
+			}
+		} 
+		if (install) {
+			try {
+				copyDirectory(sourceDir, destDir);
+				return true;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+				return false;
+			}
 		}
+		return false;		
 	}
 	
 	// from http://stackoverflow.com/questions/5368724/how-to-copy-a-folder-and-all-its-subfolders-and-files-into-another-folder
