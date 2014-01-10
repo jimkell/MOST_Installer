@@ -86,9 +86,10 @@ public class Installer  extends JFrame {
 		topLabel.setMinimumSize(new Dimension(200, 15));
 		textField.setEditable(false);
 		textField.setBackground(Color.white);
+		textField.setText(InstallerConstants.DEFAULT_WINDOWS_INSTALL_PATH);
 
 		okButton.setMnemonic(KeyEvent.VK_O);
-		okButton.setEnabled(false);
+		okButton.setEnabled(true);
 		JLabel blank = new JLabel("    "); 
 		cancelButton.setMnemonic(KeyEvent.VK_C);
 		
@@ -150,13 +151,16 @@ public class Installer  extends JFrame {
 		
 		ActionListener okButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
-				
+				install();
+				setVisible(false);
+				dispose();
 			}
 		};
 		
 		ActionListener cancelButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
-				
+				setVisible(false);
+				dispose();
 			}
 		}; 
 		
@@ -166,6 +170,17 @@ public class Installer  extends JFrame {
 		
 	} 	
 
+	public void install() {
+		File sourceDir = new File("dist");
+		File destDir = new File(textField.getText());
+		try {
+			copyDirectory(sourceDir, destDir);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
 	// from http://stackoverflow.com/questions/5368724/how-to-copy-a-folder-and-all-its-subfolders-and-files-into-another-folder
 	public static void copyDirectory(File sourceLocation , File targetLocation) throws IOException {
 		if (sourceLocation.isDirectory()) {
@@ -207,20 +222,25 @@ public class Installer  extends JFrame {
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
-		File sourceDir = new File("C:\\MOST");
+		
+		
+		//File sourceDir = new File("C:\\MOST");
+//		File sourceDir = new File("dist");
 		//File destFile = new File("C:\\downloads\\MOST.jar");
-		File dir = new File("C:\\downloads\\test");
-		if (!dir.exists()) {
-			dir.mkdir();
-		} else {
+		//File dir = new File("C:\\downloads\\test");
+//		File destDir = new File("C:\\Program Files\\Rutgers\\MOST");
+//		if (!destDir.exists()) {
+//			destDir.mkdir();
+//		} else {
 //			System.out.println("Directory exists. Do you wish to install MOST in this directory?");
 //			File destFile = new File("C:\\downloads\\test\\MOST.jar");
 //			if (destFile.exists()) {
 //				System.out.println("File exists. Do you wish to overwrite the file?");
 //			}
-		}
-		File destDir = new File("C:\\downloads\\test");
-		copyDirectory(sourceDir, destDir);
+//		}
+//		File destDir = new File(textField.getText());
+//		File destDir = new File("C:\\Program Files\\Rutgers_MOST");
+//		copyDirectory(sourceDir, destDir);
 //		File destDir = new File("C:\\downloads\\test");
 //		File destFile = new File("C:\\downloads\\test\\MOST.jar");
 //		copyFile(sourceFile, destFile);
