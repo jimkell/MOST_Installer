@@ -2,8 +2,11 @@ package edu.rutgers.MOST.presentation;
 
 public class InstallerConstants {
 
-	public static final String TITLE = "MOST";
-	public static final String TOP_LABEL = "Locate Directory Where MOST Will Be Installed:";
+	public static final String TITLE = "MOST - Setup";
+	
+	// Tried using left alignment, but it refused to work. The only way to get these to line up was with spaces.
+	public static final String TOP_LABEL =  "Setup will install MOST in the following folder.                                   "; 
+	public static final String TOP_LABEL2 = "To select another folder, click Browse and select another folder.";
 	public static final String DEFAULT_WINDOWS_INSTALL_PATH = "C:\\Program Files\\Rutgers_MOST";
 	
 	public static final String DIRECTORY_EXISTS_TITLE = "Directory Exists";
@@ -11,4 +14,13 @@ public class InstallerConstants {
 			"overwrite the contents of this directory.\n Continue with installation?";
 	
 	public static final String INSTALL_PATH_FILE_CHOOSER_TITLE = "Browse for Install Path";
+	
+	public static final String INSTALL_FRAME_CLOSE_TITLE = "Install";
+	public static final String INSTALL_FRAME_CLOSE_MESSAGE = "Setup is not complete. If you quit the setup\n" +
+			"program now, the program will not be installed.\n\n" +
+			"You may run the setup at a later time\n" +
+			"to complete the insatllation\n\n" +
+			"To continue the installation. click Resume To quit\n" +
+			"the setup program, click Exit Setup.\n\n" +
+			"";
 }

@@ -6,6 +6,8 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -41,6 +43,7 @@ public class Installer  extends JFrame {
 	public static JButton cancelButton = new JButton("  Cancel  ");
 	public static final JTextField textField = new JTextField();
 	public static JLabel topLabel = new JLabel(InstallerConstants.TOP_LABEL);
+	public static JLabel topLabel2 = new JLabel(InstallerConstants.TOP_LABEL2);
 	
 	private String path;
 
@@ -57,7 +60,27 @@ public class Installer  extends JFrame {
 	public Installer() {
 
 		setTitle(InstallerConstants.TITLE);		
-		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		
+		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
+		
+		addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent evt) {
+				Object[] options = {" Resume ", "Exit Setup",};
+				int choice = JOptionPane.showOptionDialog(null, 
+						InstallerConstants.INSTALL_FRAME_CLOSE_MESSAGE, 
+						InstallerConstants.INSTALL_FRAME_CLOSE_TITLE, 
+						JOptionPane.YES_NO_OPTION, 
+						JOptionPane.QUESTION_MESSAGE, 
+						null, options, options[0]);
+				if (choice == JOptionPane.YES_OPTION) {
+					
+				}
+				if (choice == JOptionPane.NO_OPTION) {
+					setVisible(false);
+					dispose();
+				}
+			}
+		});	
 
 		getRootPane().setDefaultButton(okButton);
 		
@@ -69,24 +92,39 @@ public class Installer  extends JFrame {
 		Box vb = Box.createVerticalBox();
 
 		Box hbLabel = Box.createHorizontalBox();
+		Box hbLabel2 = Box.createHorizontalBox();
 		Box hbMetab = Box.createHorizontalBox();
 		Box hbButton = Box.createHorizontalBox();
 
-		//JLabel topLabel = new JLabel();
-		//topLabel.setText(GraphicalInterfaceConstants.GUROBI_PATH_LABEL);
 		topLabel.setSize(new Dimension(150, 10));
 		//top, left, bottom. right
 		topLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
-		topLabel.setAlignmentX(CENTER_ALIGNMENT);
+		topLabel.setAlignmentX(LEFT_ALIGNMENT);
+		
+		topLabel2.setSize(new Dimension(150, 10));
+		//top, left, bottom. right
+		topLabel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		topLabel2.setAlignmentX(LEFT_ALIGNMENT);
 
+		topLabel.setMinimumSize(new Dimension(200, 15));
+		topLabel2.setMinimumSize(new Dimension(200, 15));
+		
 		JPanel labelPanel = new JPanel();
 		labelPanel.setLayout(new BoxLayout(labelPanel, BoxLayout.X_AXIS));
 		labelPanel.add(topLabel);
+		labelPanel.setAlignmentX(LEFT_ALIGNMENT);
 		labelPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
-
+		
 		hbLabel.add(labelPanel);
 		
-		topLabel.setMinimumSize(new Dimension(200, 15));
+		JPanel labelPanel2 = new JPanel();
+		labelPanel2.setLayout(new BoxLayout(labelPanel2, BoxLayout.X_AXIS));	
+		labelPanel2.add(topLabel2);
+		labelPanel2.setAlignmentX(LEFT_ALIGNMENT);
+		labelPanel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		
+		hbLabel2.add(labelPanel2);
+		
 		textField.setEditable(false);
 		textField.setBackground(Color.white);
 		textField.setText(InstallerConstants.DEFAULT_WINDOWS_INSTALL_PATH);
@@ -142,6 +180,7 @@ public class Installer  extends JFrame {
 		hbButton.add(buttonPanel);
 
 		vb.add(hbLabel);
+		vb.add(hbLabel2);
 		vb.add(hbMetab);
 		vb.add(hbButton);
 		add(vb);	
@@ -250,13 +289,13 @@ public class Installer  extends JFrame {
 	public static void main(String[] args) throws Exception {
 		//based on code from http://stackoverflow.com/questions/6403821/how-to-add-an-image-to-a-jframe-title-bar
 		final ArrayList<Image> icons = new ArrayList<Image>(); 
-		icons.add(new ImageIcon("images/most16.jpg").getImage()); 
-		icons.add(new ImageIcon("images/most32.jpg").getImage());
+		icons.add(new ImageIcon("etc/most16.jpg").getImage()); 
+		icons.add(new ImageIcon("etc/most32.jpg").getImage());
 
 		Installer frame = new Installer();
 		frame.setIconImages(icons);
-		frame.setSize(400, 150);
-		frame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+		frame.setSize(400, 170);
+		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
