@@ -27,4 +27,8 @@ public class InstallerConstants {
 			"the setup program, click Exit Setup.\n\n" +
 			"";
 	
+	public static final String INSTALLING = "Installing";
+	public static final String PROCESSING_OOT = " .";
+	public static final int MAX_NUM_DOTS = 21;
+	
 }

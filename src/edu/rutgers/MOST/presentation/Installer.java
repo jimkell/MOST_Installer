@@ -29,6 +29,8 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.Timer;
+
 import org.apache.log4j.Logger;
 
 public class Installer  extends JFrame {
@@ -50,6 +52,10 @@ public class Installer  extends JFrame {
 	public static JCheckBox newFolderCheckBox = new JCheckBox("Create New Folder in Selected Directory");
 	public static JLabel newFolderLabel = new JLabel(InstallerConstants.NEW_FOLDER_LABEL);
 	public static final JTextField newFolderField = new JTextField();
+	public static JLabel installingLabel = new JLabel();
+	
+	boolean install;
+	boolean done;
 	
 	private String path;
 
@@ -62,6 +68,25 @@ public class Installer  extends JFrame {
 	}
 
 	public boolean fileSelected;
+	
+	private Timer timer;
+	public Timer getTimer() {
+		return timer;
+	}
+
+	public void setTimer(Timer timer) {
+		this.timer = timer;
+	}
+	
+	private int dotCount;
+	
+	public int getDotCount() {
+		return dotCount;
+	}
+
+	public void setDotCount(int dotCount) {
+		this.dotCount = dotCount;
+	}
 	
 	public Installer() {
 
@@ -91,6 +116,8 @@ public class Installer  extends JFrame {
 		getRootPane().setDefaultButton(okButton);
 
 	    fileSelected = false;
+	    install = false;
+	    done = false;
 		
 		//box layout
 		Box vb = Box.createVerticalBox();
@@ -101,6 +128,7 @@ public class Installer  extends JFrame {
 		Box hbNewFolderCheck = Box.createHorizontalBox();
 		Box hbNewFolder = Box.createHorizontalBox();
 		Box hbButton = Box.createHorizontalBox();
+		Box hbInstallingLabel = Box.createHorizontalBox();
 
 		topLabel.setSize(new Dimension(150, 10));
 		//top, left, bottom. right
@@ -207,6 +235,13 @@ public class Installer  extends JFrame {
 		buttonPanel.setBorder(BorderFactory.createEmptyBorder(5,20,15,20));
 
 		hbButton.add(buttonPanel);
+		
+		JPanel installingLabelPanel = new JPanel();
+		installingLabelPanel.setLayout(new BoxLayout(installingLabelPanel, BoxLayout.X_AXIS));
+		installingLabelPanel.add(installingLabel);
+		installingLabelPanel.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		
+		hbInstallingLabel.add(installingLabelPanel);
 
 		vb.add(hbLabel);
 		vb.add(hbLabel2);
@@ -214,7 +249,12 @@ public class Installer  extends JFrame {
 		vb.add(hbNewFolderCheck);
 		vb.add(hbNewFolder);
 		vb.add(hbButton);
-		add(vb);	
+		vb.add(hbInstallingLabel);
+		add(vb);
+		
+		//Set up timer to drive animation events.
+		timer = new Timer(100, new TimeListener());
+		dotCount = 0;
 		
 		ActionListener fileButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
@@ -236,10 +276,11 @@ public class Installer  extends JFrame {
 		
 		ActionListener okButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
-				if (install()) {
-					setVisible(false);
-					dispose();
-				}				
+				install();
+//				if (install()) {
+//					dotCount = 0;
+//					timer.start();										
+//				}				
 			}
 		};
 		
@@ -272,7 +313,6 @@ public class Installer  extends JFrame {
 	public boolean install() {
 		File sourceDir = new File("dist");
 		File destDir = new File(directoryTextField.getText());
-		boolean install = true;
 		if (newFolderCheckBox.isSelected() && newFolderField.getText().length() > 0) {
 			String newDirName = directoryTextField.getText() + "\\" + newFolderField.getText();
 			destDir = new File(newDirName);
@@ -285,7 +325,7 @@ public class Installer  extends JFrame {
 						JOptionPane.QUESTION_MESSAGE, 
 						null, options, options[0]);
 				if (choice == JOptionPane.YES_OPTION) {
-					
+					install = true;
 				}
 				// set old equation
 				if (choice == JOptionPane.NO_OPTION) {
@@ -306,17 +346,22 @@ public class Installer  extends JFrame {
 					JOptionPane.QUESTION_MESSAGE, 
 					null, options, options[0]);
 			if (choice == JOptionPane.YES_OPTION) {
-				
+				install = true;
 			}
 			// set old equation
 			if (choice == JOptionPane.NO_OPTION) {
 				install = false;
 				return false;
 			}
-		} 
+		} else {
+			install = true;
+		}
 		if (install) {
+			dotCount = 0;
+			timer.start();
 			try {
 				copyDirectory(sourceDir, destDir);
+				done = true;
 				return true;
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
@@ -363,6 +408,27 @@ public class Installer  extends JFrame {
 			newFolderCheckBox.setEnabled(false);
 		}	
 	}
+	
+	class TimeListener implements ActionListener {
+		public void actionPerformed(ActionEvent ae) {
+			dotCount += 1;
+			StringBuffer dotBuffer = new StringBuffer();
+			int numDots = dotCount % (InstallerConstants.MAX_NUM_DOTS + 1);
+			for (int i = 0; i < numDots; i++) {
+				dotBuffer.append(" .");
+			}
+			installingLabel.setText(InstallerConstants.INSTALLING + dotBuffer.toString());
+			// allows install animation to run even if install is fast. on slower
+			// systems, may take longer than 2 seconds to install
+			if (dotCount == 20) {
+				if (done) {
+					setVisible(false);
+					dispose();
+					timer.stop();
+				}
+			}			
+		}
+	}
 
 	public static void main(String[] args) throws Exception {
 		//based on code from http://stackoverflow.com/questions/6403821/how-to-add-an-image-to-a-jframe-title-bar
@@ -372,7 +438,7 @@ public class Installer  extends JFrame {
 
 		Installer frame = new Installer();
 		frame.setIconImages(icons);
-		frame.setSize(400, 280);
+		frame.setSize(400, 300);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
