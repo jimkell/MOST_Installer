@@ -44,8 +44,9 @@ public class Installer  extends JFrame {
 	static Logger log = Logger.getLogger(Installer.class);
 	
 	public static JButton fileButton = new JButton("Browse");
-	public static JButton okButton = new JButton("    OK    ");
+	public static JButton okButton = new JButton("  Install  ");
 	public static JButton cancelButton = new JButton("  Cancel  ");
+	public static JButton nextButton = new JButton(" Next >> ");
 	public static final JTextField directoryTextField = new JTextField();
 	public static JLabel topLabel = new JLabel(InstallerConstants.TOP_LABEL);
 	public static JLabel topLabel2 = new JLabel(InstallerConstants.TOP_LABEL2);
@@ -169,8 +170,11 @@ public class Installer  extends JFrame {
 
 		okButton.setMnemonic(KeyEvent.VK_O);
 		okButton.setEnabled(true);
-		JLabel blank = new JLabel("    "); 
+		JLabel blank = new JLabel("    "); 		
 		cancelButton.setMnemonic(KeyEvent.VK_C);
+		JLabel blankB = new JLabel("    "); 
+		nextButton.setMnemonic(KeyEvent.VK_N);
+		nextButton.setEnabled(false);
 		
 		directoryTextField.setPreferredSize(new Dimension(260, 25));
 		directoryTextField.setMaximumSize(new Dimension(260, 25));
@@ -232,6 +236,8 @@ public class Installer  extends JFrame {
 		buttonPanel.add(okButton);
 		buttonPanel.add(blank);
 		buttonPanel.add(cancelButton);
+		buttonPanel.add(blankB);
+		buttonPanel.add(nextButton);
 		buttonPanel.setBorder(BorderFactory.createEmptyBorder(5,20,15,20));
 
 		hbButton.add(buttonPanel);
@@ -274,6 +280,18 @@ public class Installer  extends JFrame {
 			}
 		};
 		
+		ActionListener newFolderCheckBoxActionListener = new ActionListener() {
+			public void actionPerformed(ActionEvent prodActionEvent) {
+				if (newFolderCheckBox.isSelected()) {
+					newFolderLabel.setEnabled(true);
+					newFolderField.setEnabled(true);
+				} else {
+					newFolderLabel.setEnabled(false);
+					newFolderField.setEnabled(false);
+				}
+			}
+		};
+		
 		ActionListener okButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
 				install();
@@ -291,22 +309,20 @@ public class Installer  extends JFrame {
 			}
 		}; 
 		
-		ActionListener newFolderCheckBoxActionListener = new ActionListener() {
+		ActionListener nextButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
-				if (newFolderCheckBox.isSelected()) {
-					newFolderLabel.setEnabled(true);
-					newFolderField.setEnabled(true);
-				} else {
-					newFolderLabel.setEnabled(false);
-					newFolderField.setEnabled(false);
-				}
+				setVisible(false);
+				dispose();
+				// need to launch MOST programmatically here
 			}
-		};
+		}; 
+		
+		newFolderCheckBox.addActionListener(newFolderCheckBoxActionListener);
 		
 		fileButton.addActionListener(fileButtonActionListener);
 		okButton.addActionListener(okButtonActionListener);
 		cancelButton.addActionListener(cancelButtonActionListener);
-		newFolderCheckBox.addActionListener(newFolderCheckBoxActionListener);
+		nextButton.addActionListener(nextButtonActionListener);
 		
 	} 	
 
@@ -420,11 +436,13 @@ public class Installer  extends JFrame {
 			installingLabel.setText(InstallerConstants.INSTALLING + dotBuffer.toString());
 			// allows install animation to run even if install is fast. on slower
 			// systems, may take longer than 2 seconds to install
-			if (dotCount == 20) {
+			if (dotCount >= 20) {
 				if (done) {
-					setVisible(false);
-					dispose();
-					timer.stop();
+					timer.stop();	
+					okButton.setEnabled(false);
+					cancelButton.setEnabled(false);
+					nextButton.setEnabled(true);
+					installingLabel.setText(InstallerConstants.CLICK_NEXT);
 				}
 			}			
 		}
