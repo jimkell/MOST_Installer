@@ -15,6 +15,9 @@ public class InstallerConstants {
 	
 	public static final String INSTALL_PATH_FILE_CHOOSER_TITLE = "Browse for Install Path";
 	
+	public static final String NEW_FOLDER_CHECK_BOX_LABEL = "Create New Folder in Selected Directory";
+	public static final String NEW_FOLDER_LABEL = "Enter Folder Name                  ";
+	
 	public static final String INSTALL_FRAME_CLOSE_TITLE = "Install";
 	public static final String INSTALL_FRAME_CLOSE_MESSAGE = "Setup is not complete. If you quit the setup\n" +
 			"program now, the program will not be installed.\n\n" +
@@ -23,4 +26,5 @@ public class InstallerConstants {
 			"To continue the installation. click Resume To quit\n" +
 			"the setup program, click Exit Setup.\n\n" +
 			"";
+	
 }

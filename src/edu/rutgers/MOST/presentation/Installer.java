@@ -21,6 +21,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
@@ -44,6 +45,9 @@ public class Installer  extends JFrame {
 	public static final JTextField textField = new JTextField();
 	public static JLabel topLabel = new JLabel(InstallerConstants.TOP_LABEL);
 	public static JLabel topLabel2 = new JLabel(InstallerConstants.TOP_LABEL2);
+	public static JCheckBox newFolderCheckBox = new JCheckBox("Create New Folder in Selected Directory");
+	public static JLabel newFolderLabel = new JLabel(InstallerConstants.NEW_FOLDER_LABEL);
+	public static final JTextField newFolderField = new JTextField();
 	
 	private String path;
 
@@ -93,7 +97,9 @@ public class Installer  extends JFrame {
 
 		Box hbLabel = Box.createHorizontalBox();
 		Box hbLabel2 = Box.createHorizontalBox();
-		Box hbMetab = Box.createHorizontalBox();
+		Box hbDir = Box.createHorizontalBox();
+		Box hbNewFolderCheck = Box.createHorizontalBox();
+		Box hbNewFolder = Box.createHorizontalBox();
 		Box hbButton = Box.createHorizontalBox();
 
 		topLabel.setSize(new Dimension(150, 10));
@@ -134,7 +140,6 @@ public class Installer  extends JFrame {
 		JLabel blank = new JLabel("    "); 
 		cancelButton.setMnemonic(KeyEvent.VK_C);
 		
-
 		textField.getDocument().addDocumentListener(new DocumentListener() {
 			public void changedUpdate(DocumentEvent e) {
 				enableOKButton();
@@ -157,6 +162,10 @@ public class Installer  extends JFrame {
 			}
 		});
 		
+		textField.setPreferredSize(new Dimension(260, 25));
+		textField.setMaximumSize(new Dimension(260, 25));
+		textField.setMinimumSize(new Dimension(260, 25));
+		
 		JPanel textPanel = new JPanel();
 		textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.X_AXIS));
 		textPanel.add(textField);
@@ -165,10 +174,41 @@ public class Installer  extends JFrame {
 		JLabel blank2 = new JLabel("      ");
 		JLabel blank3 = new JLabel("      ");
 		
-		hbMetab.add(blank2);
-		hbMetab.add(fileButton);
-		hbMetab.add(textPanel);
-		hbMetab.add(blank3);
+		hbDir.add(blank2);
+		hbDir.add(fileButton);
+		hbDir.add(textPanel);
+		hbDir.add(blank3);
+		
+		JPanel newFolderCheckPanel = new JPanel();
+		newFolderCheckPanel.setLayout(new BoxLayout(newFolderCheckPanel, BoxLayout.X_AXIS));
+		newFolderCheckPanel.add(newFolderCheckBox);
+		newFolderCheckPanel.setBorder(BorderFactory.createEmptyBorder(20,0,0,0));
+		
+		JLabel blank4 = new JLabel("                                        ");
+		
+		hbNewFolderCheck.add(newFolderCheckPanel);
+		hbNewFolderCheck.add(blank4);
+		
+		newFolderField.setPreferredSize(new Dimension(200, 25));
+		newFolderField.setMaximumSize(new Dimension(200, 25));
+		newFolderField.setMinimumSize(new Dimension(200, 25));
+		
+		JPanel newFolderPanel = new JPanel();
+		newFolderPanel.setLayout(new BoxLayout(newFolderPanel, BoxLayout.X_AXIS));
+		newFolderPanel.add(newFolderLabel);
+		newFolderPanel.setBorder(BorderFactory.createEmptyBorder(0,0,10,0));
+
+		hbNewFolder.add(newFolderPanel);
+		//hbNewFolder.setAlignmentX(LEFT_ALIGNMENT);
+
+		JPanel newFolderFieldPanel = new JPanel();
+		newFolderFieldPanel.setLayout(new BoxLayout(newFolderFieldPanel, BoxLayout.X_AXIS));
+		newFolderFieldPanel.add(newFolderField);
+		newFolderFieldPanel.setBorder(BorderFactory.createEmptyBorder(0,0,10,0));
+		//newFolderFieldPanel.setAlignmentX(RIGHT_ALIGNMENT);
+		
+		hbNewFolder.add(newFolderFieldPanel);
+		//hbNewFolder.setAlignmentX(RIGHT_ALIGNMENT);
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -181,7 +221,9 @@ public class Installer  extends JFrame {
 
 		vb.add(hbLabel);
 		vb.add(hbLabel2);
-		vb.add(hbMetab);
+		vb.add(hbDir);
+		vb.add(hbNewFolderCheck);
+		vb.add(hbNewFolder);
 		vb.add(hbButton);
 		add(vb);	
 		
@@ -294,7 +336,8 @@ public class Installer  extends JFrame {
 
 		Installer frame = new Installer();
 		frame.setIconImages(icons);
-		frame.setSize(400, 170);
+		frame.setSize(400, 250);
+		frame.setResizable(false);
 		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
