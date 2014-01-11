@@ -22,7 +22,6 @@ import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBox;
-import javax.swing.JDialog;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -30,9 +29,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import org.apache.log4j.Logger;
 
 public class Installer  extends JFrame {
@@ -48,7 +44,7 @@ public class Installer  extends JFrame {
 	public static JButton fileButton = new JButton("Browse");
 	public static JButton okButton = new JButton("    OK    ");
 	public static JButton cancelButton = new JButton("  Cancel  ");
-	public static final JTextField textField = new JTextField();
+	public static final JTextField directoryTextField = new JTextField();
 	public static JLabel topLabel = new JLabel(InstallerConstants.TOP_LABEL);
 	public static JLabel topLabel2 = new JLabel(InstallerConstants.TOP_LABEL2);
 	public static JCheckBox newFolderCheckBox = new JCheckBox("Create New Folder in Selected Directory");
@@ -93,8 +89,6 @@ public class Installer  extends JFrame {
 		});	
 
 		getRootPane().setDefaultButton(okButton);
-		
-		//textField.setText("");
 
 	    fileSelected = false;
 		
@@ -103,7 +97,7 @@ public class Installer  extends JFrame {
 
 		Box hbLabel = Box.createHorizontalBox();
 		Box hbLabel2 = Box.createHorizontalBox();
-		Box hbDir = Box.createHorizontalBox();
+		Box hbDirectory = Box.createHorizontalBox();
 		Box hbNewFolderCheck = Box.createHorizontalBox();
 		Box hbNewFolder = Box.createHorizontalBox();
 		Box hbButton = Box.createHorizontalBox();
@@ -137,9 +131,9 @@ public class Installer  extends JFrame {
 		
 		hbLabel2.add(labelPanel2);
 		
-		textField.setEditable(false);
-		textField.setBackground(Color.white);
-		textField.setText(InstallerConstants.DEFAULT_WINDOWS_INSTALL_PATH);
+		directoryTextField.setEditable(false);
+		directoryTextField.setBackground(Color.white);
+		directoryTextField.setText(InstallerConstants.DEFAULT_WINDOWS_INSTALL_PATH);
 		// if path in text area does not exist, make new folder will be disabled. 
 		maybeEnableCheckBox();
 		newFolderLabel.setEnabled(false);
@@ -149,39 +143,14 @@ public class Installer  extends JFrame {
 		okButton.setEnabled(true);
 		JLabel blank = new JLabel("    "); 
 		cancelButton.setMnemonic(KeyEvent.VK_C);
-//		
-//		textField.getDocument().addDocumentListener(new DocumentListener() {
-//			public void changedUpdate(DocumentEvent e) {
-//				enableOKButton();	
-//				maybeEnableCheckBox();
-//			}
-//			public void removeUpdate(DocumentEvent e) {
-//				enableOKButton();
-//				maybeEnableCheckBox();
-//			}
-//			public void insertUpdate(DocumentEvent e) {
-//				enableOKButton();
-//				maybeEnableCheckBox();
-//			}
-//
-//			public void enableOKButton() {
-//				if (textField.getText() != null && textField.getText().length() > 0) {
-//					okButton.setEnabled(true);
-//					//LocalConfig.getInstance().hasMetabolitesFile = true;
-//				} else {
-//					okButton.setEnabled(false);
-//					//LocalConfig.getInstance().hasMetabolitesFile = false;
-//				}
-//			}
-//		});
 		
-		textField.setPreferredSize(new Dimension(260, 25));
-		textField.setMaximumSize(new Dimension(260, 25));
-		textField.setMinimumSize(new Dimension(260, 25));
+		directoryTextField.setPreferredSize(new Dimension(260, 25));
+		directoryTextField.setMaximumSize(new Dimension(260, 25));
+		directoryTextField.setMinimumSize(new Dimension(260, 25));
 		
 		JPanel textPanel = new JPanel();
 		textPanel.setLayout(new BoxLayout(textPanel, BoxLayout.X_AXIS));
-		textPanel.add(textField);
+		textPanel.add(directoryTextField);
 		textPanel.setBorder(BorderFactory.createEmptyBorder(10,20,10,20));
 
 		JLabel blank2 = new JLabel("      ");
@@ -189,10 +158,10 @@ public class Installer  extends JFrame {
 		
 		fileButton.setMnemonic(KeyEvent.VK_B);
 		
-		hbDir.add(blank2);
-		hbDir.add(fileButton);
-		hbDir.add(textPanel);
-		hbDir.add(blank3);
+		hbDirectory.add(blank2);
+		hbDirectory.add(fileButton);
+		hbDirectory.add(textPanel);
+		hbDirectory.add(blank3);
 		
 		newFolderCheckBox.setMnemonic(KeyEvent.VK_C);
 		
@@ -241,7 +210,7 @@ public class Installer  extends JFrame {
 
 		vb.add(hbLabel);
 		vb.add(hbLabel2);
-		vb.add(hbDir);
+		vb.add(hbDirectory);
 		vb.add(hbNewFolderCheck);
 		vb.add(hbNewFolder);
 		vb.add(hbButton);
@@ -259,7 +228,7 @@ public class Installer  extends JFrame {
 				if (retval == JFileChooser.APPROVE_OPTION) {
 					//... The user selected a file, get it, use it.          	
 					File file = fileChooser.getSelectedFile();
-					textField.setText(file.getPath());
+					directoryTextField.setText(file.getPath());
 					maybeEnableCheckBox();
 				}
 			}
@@ -302,9 +271,17 @@ public class Installer  extends JFrame {
 
 	public boolean install() {
 		File sourceDir = new File("dist");
-		File destDir = new File(textField.getText());
+		File destDir = new File(directoryTextField.getText());
 		boolean install = true;
-		if (destDir.exists()) {
+		if (newFolderCheckBox.isSelected() && newFolderField.getText().length() > 0) {
+			String newDirName = directoryTextField.getText() + "\\" + newFolderField.getText();
+			destDir = new File(newDirName);
+			if (!destDir.exists()) {
+				destDir.mkdir();
+			}
+		}
+		// only show message if directory exists and is not a newly created folder
+		if (destDir.exists() && !newFolderCheckBox.isSelected()) {
 			Object[] options = {"    Yes    ", "    No    ",};
 			int choice = JOptionPane.showOptionDialog(null, 
 					InstallerConstants.DIRECTORY_EXISTS_MESSAGE, 
@@ -363,8 +340,7 @@ public class Installer  extends JFrame {
 	}
 	
 	public void maybeEnableCheckBox() {
-		File f = new File(textField.getText());
-		System.out.println(f.exists());
+		File f = new File(directoryTextField.getText());
 		if (f.exists()) {
 			newFolderCheckBox.setEnabled(true);
 		} else {
