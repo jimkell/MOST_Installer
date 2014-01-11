@@ -276,7 +276,23 @@ public class Installer  extends JFrame {
 		if (newFolderCheckBox.isSelected() && newFolderField.getText().length() > 0) {
 			String newDirName = directoryTextField.getText() + "\\" + newFolderField.getText();
 			destDir = new File(newDirName);
-			if (!destDir.exists()) {
+			if (destDir.exists()) {
+				Object[] options = {"    Yes    ", "    No    ",};
+				int choice = JOptionPane.showOptionDialog(null, 
+						InstallerConstants.DIRECTORY_EXISTS_MESSAGE, 
+						InstallerConstants.DIRECTORY_EXISTS_TITLE, 
+						JOptionPane.YES_NO_OPTION, 
+						JOptionPane.QUESTION_MESSAGE, 
+						null, options, options[0]);
+				if (choice == JOptionPane.YES_OPTION) {
+					
+				}
+				// set old equation
+				if (choice == JOptionPane.NO_OPTION) {
+					install = false;
+					return false;
+				}
+			} else {
 				destDir.mkdir();
 			}
 		}
