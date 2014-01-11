@@ -33,4 +33,6 @@ public class InstallerConstants {
 	
 	public static final String CLICK_NEXT = "Installation complete. Click 'Next' to set up Gurobi";
 	
+	public static final String SHORTCUT_NAME = "MOST";
+	
 }

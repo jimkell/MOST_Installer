@@ -8,12 +8,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.Writer;
 import java.util.ArrayList;
 
 import javax.swing.BorderFactory;
@@ -377,6 +381,10 @@ public class Installer  extends JFrame {
 			timer.start();
 			try {
 				copyDirectory(sourceDir, destDir);
+				// create desktop shortcut
+				writeVBSScriptFile(destDir.getPath());
+				// from http://stackoverflow.com/questions/13586213/how-to-execute-vbs-script-in-java
+				Runtime.getRuntime().exec("wscript.exe " + "MOST.vbs");
 				done = true;
 				return true;
 			} catch (IOException e) {
@@ -448,6 +456,41 @@ public class Installer  extends JFrame {
 		}
 	}
 
+	// create vbs file to create desktop shortcut
+	public void writeVBSScriptFile(String path) {
+		Writer writer = null;
+		StringBuffer bfr = new StringBuffer();
+		// vbs file from http://www.tomshardware.com/forum/52871-45-creating-desktop-shortcuts-command-line
+		bfr.append("set WshShell = WScript.CreateObject(\"WScript.Shell\")\n");
+		bfr.append("strDesktop = WshShell.SpecialFolders(\"AllUsersDesktop\")\n");
+		bfr.append("set oShellLink = WshShell.CreateShortcut(strDesktop & \"\\" + InstallerConstants.SHORTCUT_NAME + ".lnk\")\n");
+		bfr.append("oShellLink.TargetPath = \"" + path + "\\MOST.exe\"\n");
+		bfr.append("oShellLink.WindowStyle = 1\n");
+		bfr.append("oShellLink.IconLocation = \"" + path + "\\etc\\most32.ico\"\n");
+		bfr.append("oShellLink.Description = \"Shortcut Script\"\n");
+		bfr.append("oShellLink.WorkingDirectory = \"" + path + "\"\n");
+		bfr.append("oShellLink.Save");
+		System.out.println(bfr.toString());
+		try {
+			File file = new File("MOST.vbs");
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write(bfr.toString());
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (writer != null) {
+					writer.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
 	public static void main(String[] args) throws Exception {
 		//based on code from http://stackoverflow.com/questions/6403821/how-to-add-an-image-to-a-jframe-title-bar
 		final ArrayList<Image> icons = new ArrayList<Image>(); 
@@ -461,8 +504,7 @@ public class Installer  extends JFrame {
 		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		
-		
+	
 		
 		//File sourceDir = new File("C:\\MOST");
 //		File sourceDir = new File("dist");
