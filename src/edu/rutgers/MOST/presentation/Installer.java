@@ -33,12 +33,18 @@ import javax.swing.JTextField;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.apache.log4j.Logger;
+
 public class Installer  extends JFrame {
 
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	
+	//log4j
+	static Logger log = Logger.getLogger(Installer.class);
+	
 	public static JButton fileButton = new JButton("Browse");
 	public static JButton okButton = new JButton("    OK    ");
 	public static JButton cancelButton = new JButton("  Cancel  ");
@@ -63,7 +69,7 @@ public class Installer  extends JFrame {
 	
 	public Installer() {
 
-		setTitle(InstallerConstants.TITLE);		
+		setTitle(InstallerConstants.TITLE);	
 		
 		setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		
@@ -104,12 +110,12 @@ public class Installer  extends JFrame {
 
 		topLabel.setSize(new Dimension(150, 10));
 		//top, left, bottom. right
-		topLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 0, 0));
+		topLabel.setBorder(BorderFactory.createEmptyBorder(20, 0, 0, 0));
 		topLabel.setAlignmentX(LEFT_ALIGNMENT);
 		
 		topLabel2.setSize(new Dimension(150, 10));
 		//top, left, bottom. right
-		topLabel2.setBorder(BorderFactory.createEmptyBorder(0, 0, 0, 0));
+		topLabel2.setBorder(BorderFactory.createEmptyBorder(3, 0, 10, 0));
 		topLabel2.setAlignmentX(LEFT_ALIGNMENT);
 
 		topLabel.setMinimumSize(new Dimension(200, 15));
@@ -134,33 +140,40 @@ public class Installer  extends JFrame {
 		textField.setEditable(false);
 		textField.setBackground(Color.white);
 		textField.setText(InstallerConstants.DEFAULT_WINDOWS_INSTALL_PATH);
+		// if path in text area does not exist, make new folder will be disabled. 
+		maybeEnableCheckBox();
+		newFolderLabel.setEnabled(false);
+		newFolderField.setEnabled(false);
 
 		okButton.setMnemonic(KeyEvent.VK_O);
 		okButton.setEnabled(true);
 		JLabel blank = new JLabel("    "); 
 		cancelButton.setMnemonic(KeyEvent.VK_C);
-		
-		textField.getDocument().addDocumentListener(new DocumentListener() {
-			public void changedUpdate(DocumentEvent e) {
-				enableOKButton();
-			}
-			public void removeUpdate(DocumentEvent e) {
-				enableOKButton();
-			}
-			public void insertUpdate(DocumentEvent e) {
-				enableOKButton();
-			}
-
-			public void enableOKButton() {
-				if (textField.getText() != null && textField.getText().length() > 0) {
-					okButton.setEnabled(true);
-					//LocalConfig.getInstance().hasMetabolitesFile = true;
-				} else {
-					okButton.setEnabled(false);
-					//LocalConfig.getInstance().hasMetabolitesFile = false;
-				}
-			}
-		});
+//		
+//		textField.getDocument().addDocumentListener(new DocumentListener() {
+//			public void changedUpdate(DocumentEvent e) {
+//				enableOKButton();	
+//				maybeEnableCheckBox();
+//			}
+//			public void removeUpdate(DocumentEvent e) {
+//				enableOKButton();
+//				maybeEnableCheckBox();
+//			}
+//			public void insertUpdate(DocumentEvent e) {
+//				enableOKButton();
+//				maybeEnableCheckBox();
+//			}
+//
+//			public void enableOKButton() {
+//				if (textField.getText() != null && textField.getText().length() > 0) {
+//					okButton.setEnabled(true);
+//					//LocalConfig.getInstance().hasMetabolitesFile = true;
+//				} else {
+//					okButton.setEnabled(false);
+//					//LocalConfig.getInstance().hasMetabolitesFile = false;
+//				}
+//			}
+//		});
 		
 		textField.setPreferredSize(new Dimension(260, 25));
 		textField.setMaximumSize(new Dimension(260, 25));
@@ -174,15 +187,19 @@ public class Installer  extends JFrame {
 		JLabel blank2 = new JLabel("      ");
 		JLabel blank3 = new JLabel("      ");
 		
+		fileButton.setMnemonic(KeyEvent.VK_B);
+		
 		hbDir.add(blank2);
 		hbDir.add(fileButton);
 		hbDir.add(textPanel);
 		hbDir.add(blank3);
 		
+		newFolderCheckBox.setMnemonic(KeyEvent.VK_C);
+		
 		JPanel newFolderCheckPanel = new JPanel();
 		newFolderCheckPanel.setLayout(new BoxLayout(newFolderCheckPanel, BoxLayout.X_AXIS));
 		newFolderCheckPanel.add(newFolderCheckBox);
-		newFolderCheckPanel.setBorder(BorderFactory.createEmptyBorder(20,0,0,0));
+		newFolderCheckPanel.setBorder(BorderFactory.createEmptyBorder(20,0,10,0));
 		
 		JLabel blank4 = new JLabel("                                        ");
 		
@@ -197,6 +214,9 @@ public class Installer  extends JFrame {
 		newFolderPanel.setLayout(new BoxLayout(newFolderPanel, BoxLayout.X_AXIS));
 		newFolderPanel.add(newFolderLabel);
 		newFolderPanel.setBorder(BorderFactory.createEmptyBorder(0,0,10,0));
+		
+		newFolderLabel.setDisplayedMnemonic('N');
+		newFolderLabel.setLabelFor(newFolderField);
 
 		hbNewFolder.add(newFolderPanel);
 		//hbNewFolder.setAlignmentX(LEFT_ALIGNMENT);
@@ -240,6 +260,7 @@ public class Installer  extends JFrame {
 					//... The user selected a file, get it, use it.          	
 					File file = fileChooser.getSelectedFile();
 					textField.setText(file.getPath());
+					maybeEnableCheckBox();
 				}
 			}
 		};
@@ -260,9 +281,22 @@ public class Installer  extends JFrame {
 			}
 		}; 
 		
+		ActionListener newFolderCheckBoxActionListener = new ActionListener() {
+			public void actionPerformed(ActionEvent prodActionEvent) {
+				if (newFolderCheckBox.isSelected()) {
+					newFolderLabel.setEnabled(true);
+					newFolderField.setEnabled(true);
+				} else {
+					newFolderLabel.setEnabled(false);
+					newFolderField.setEnabled(false);
+				}
+			}
+		};
+		
 		fileButton.addActionListener(fileButtonActionListener);
 		okButton.addActionListener(okButtonActionListener);
 		cancelButton.addActionListener(cancelButtonActionListener);
+		newFolderCheckBox.addActionListener(newFolderCheckBoxActionListener);
 		
 	} 	
 
@@ -327,6 +361,16 @@ public class Installer  extends JFrame {
 			out.close();
 		}
 	}
+	
+	public void maybeEnableCheckBox() {
+		File f = new File(textField.getText());
+		System.out.println(f.exists());
+		if (f.exists()) {
+			newFolderCheckBox.setEnabled(true);
+		} else {
+			newFolderCheckBox.setEnabled(false);
+		}	
+	}
 
 	public static void main(String[] args) throws Exception {
 		//based on code from http://stackoverflow.com/questions/6403821/how-to-add-an-image-to-a-jframe-title-bar
@@ -336,7 +380,7 @@ public class Installer  extends JFrame {
 
 		Installer frame = new Installer();
 		frame.setIconImages(icons);
-		frame.setSize(400, 250);
+		frame.setSize(400, 280);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
