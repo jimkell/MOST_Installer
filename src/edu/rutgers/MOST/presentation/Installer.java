@@ -94,6 +94,16 @@ public class Installer  extends JFrame {
 		this.dotCount = dotCount;
 	}
 	
+	private String destinationDirectory;
+	
+	public String getDestinationDirectory() {
+		return destinationDirectory;
+	}
+
+	public void setDestinationDirectory(String destinationDirectory) {
+		this.destinationDirectory = destinationDirectory;
+	}
+
 	public Installer() {
 
 		setTitle(InstallerConstants.TITLE);	
@@ -327,7 +337,18 @@ public class Installer  extends JFrame {
 			public void actionPerformed(ActionEvent prodActionEvent) {
 				setVisible(false);
 				dispose();
-				// need to launch MOST programmatically here
+				try {
+					System.out.println(getDestinationDirectory());
+					createBatchFile(getDestinationDirectory());
+					//Runtime.getRuntime().exec(getDestinationDirectory() + "\\MOST.exe");
+					Runtime.getRuntime().exec("cmd /c c:\\MOST.bat");
+//					File f = new File("c:\\MOST.bat");
+//					if (f.exists()) {
+//						//System.out.println(filename);
+//						delete("c:\\MOST.bat");						
+//					}
+				} catch (IOException e) {
+				}
 			}
 		}; 
 		
@@ -386,6 +407,7 @@ public class Installer  extends JFrame {
 		} else {
 			install = true;
 		}
+		setDestinationDirectory(destDir.getPath());
 		if (install) {
 			dotCount = 0;
 			timer.start();
@@ -502,6 +524,90 @@ public class Installer  extends JFrame {
 			}
 		}
 	}
+	
+	// the following code would launch MOST but there were no icons and
+	// ModelCollection.csv file was not found
+	public void run (String path)
+	{
+		try
+		{
+			Runtime rt = Runtime.getRuntime();
+			Process p = rt.exec(path + "\\MOST.exe");
+		}
+		catch(Exception e)
+		{
+		}
+	}
+	
+	// creating a batch file loads MOST correctly
+	public void createBatchFile(String path) {
+		Writer writer = null;
+		StringBuffer bfr = new StringBuffer();
+		bfr.append("cd \"" + path + "\"\n");
+		bfr.append("START MOST.exe");
+		System.out.println(bfr.toString());
+		try {
+			File file = new File("C:\\MOST.bat");
+			writer = new BufferedWriter(new FileWriter(file));
+			writer.write(bfr.toString());
+
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		} finally {
+			try {
+				if (writer != null) {
+					writer.close();
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+	
+	public void deleteFileIfExists(String filename) {
+		File f = new File(filename);
+		if (f.exists()) {
+			//System.out.println(filename);
+			delete(filename);						
+		}
+	}
+	
+	// based on http://www.java2s.com/Code/Java/File-Input-Output/DeletefileusingJavaIOAPI.htm
+		public void delete(String fileName) {
+			// A File object to represent the filename
+			File f = new File(fileName);
+
+			// Make sure the file or directory exists and isn't write protected
+			if (!f.exists())
+				//System.out.println("Delete: no such file or directory: " + fileName);
+
+			if (!f.canRead())
+				//System.out.println("Delete: can't read: "+ fileName);
+			
+			if (!f.canWrite())
+				//System.out.println("Delete: write protected: "+ fileName);
+
+			if (!f.canExecute())
+				//System.out.println("Delete: can't execute: "+ fileName);
+			
+			// If it is a directory, make sure it is empty
+			if (f.isDirectory()) {
+				String[] files = f.list();
+				if (files.length > 0) {
+					//System.out.println("Delete: directory not empty: " + fileName);
+				}				
+			}
+			
+	        // Attempt to delete it
+	        boolean success = f.delete();
+	        if (success)
+	        	//System.out.println(fileName + " deletion succeeded");
+		    if (!success) {
+		    	//System.out.println(fileName + " deletion failed");
+		    }	 
+		}
 	
 	public static void main(String[] args) throws Exception {
 		//based on code from http://stackoverflow.com/questions/6403821/how-to-add-an-image-to-a-jframe-title-bar
