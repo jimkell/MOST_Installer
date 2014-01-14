@@ -47,16 +47,17 @@ public class Installer  extends JFrame {
 	//log4j
 	static Logger log = Logger.getLogger(Installer.class);
 	
-	public static JButton fileButton = new JButton("Browse");
-	public static JButton okButton = new JButton("  Install  ");
-	public static JButton cancelButton = new JButton("  Cancel  ");
-	public static JButton nextButton = new JButton(" Next >> ");
+	public static JButton fileButton = new JButton("Browse");	
 	public static final JTextField directoryTextField = new JTextField();
 	public static JLabel topLabel = new JLabel(InstallerConstants.TOP_LABEL);
 	public static JLabel topLabel2 = new JLabel(InstallerConstants.TOP_LABEL2);
-	public static JCheckBox newFolderCheckBox = new JCheckBox("Create New Folder in Selected Directory");
+	public static JCheckBox newFolderCheckBox = new JCheckBox(InstallerConstants.NEW_FOLDER_CHECK_BOX_LABEL);
 	public static JLabel newFolderLabel = new JLabel(InstallerConstants.NEW_FOLDER_LABEL);
 	public static final JTextField newFolderField = new JTextField();
+	public static JCheckBox desktopShortcutCheckBox = new JCheckBox(InstallerConstants.DESKTOP_SHORTCUT_CHECK_BOX_LABEL);
+	public static JButton okButton = new JButton("  Install  ");
+	public static JButton cancelButton = new JButton("  Cancel  ");
+	public static JButton nextButton = new JButton(" Next >> ");
 	public static JLabel installingLabel = new JLabel();
 	
 	boolean install;
@@ -132,6 +133,7 @@ public class Installer  extends JFrame {
 		Box hbDirectory = Box.createHorizontalBox();
 		Box hbNewFolderCheck = Box.createHorizontalBox();
 		Box hbNewFolder = Box.createHorizontalBox();
+		Box hbDesktopShortcut = Box.createHorizontalBox();
 		Box hbButton = Box.createHorizontalBox();
 		Box hbInstallingLabel = Box.createHorizontalBox();
 
@@ -172,7 +174,7 @@ public class Installer  extends JFrame {
 		newFolderLabel.setEnabled(false);
 		newFolderField.setEnabled(false);
 
-		okButton.setMnemonic(KeyEvent.VK_O);
+		okButton.setMnemonic(KeyEvent.VK_I);
 		okButton.setEnabled(true);
 		JLabel blank = new JLabel("    "); 		
 		cancelButton.setMnemonic(KeyEvent.VK_C);
@@ -199,7 +201,7 @@ public class Installer  extends JFrame {
 		hbDirectory.add(textPanel);
 		hbDirectory.add(blank3);
 		
-		newFolderCheckBox.setMnemonic(KeyEvent.VK_C);
+		newFolderCheckBox.setMnemonic(KeyEvent.VK_F);
 		
 		JPanel newFolderCheckPanel = new JPanel();
 		newFolderCheckPanel.setLayout(new BoxLayout(newFolderCheckPanel, BoxLayout.X_AXIS));
@@ -220,7 +222,7 @@ public class Installer  extends JFrame {
 		newFolderPanel.add(newFolderLabel);
 		newFolderPanel.setBorder(BorderFactory.createEmptyBorder(0,0,10,0));
 		
-		newFolderLabel.setDisplayedMnemonic('N');
+		newFolderLabel.setDisplayedMnemonic('E');
 		newFolderLabel.setLabelFor(newFolderField);
 
 		hbNewFolder.add(newFolderPanel);
@@ -230,10 +232,21 @@ public class Installer  extends JFrame {
 		newFolderFieldPanel.setLayout(new BoxLayout(newFolderFieldPanel, BoxLayout.X_AXIS));
 		newFolderFieldPanel.add(newFolderField);
 		newFolderFieldPanel.setBorder(BorderFactory.createEmptyBorder(0,0,10,0));
-		//newFolderFieldPanel.setAlignmentX(RIGHT_ALIGNMENT);
 		
 		hbNewFolder.add(newFolderFieldPanel);
-		//hbNewFolder.setAlignmentX(RIGHT_ALIGNMENT);
+		
+		desktopShortcutCheckBox.setMnemonic(KeyEvent.VK_D);
+		desktopShortcutCheckBox.setSelected(true);
+		
+		JPanel desktopShortcutPanel = new JPanel();
+		desktopShortcutPanel.setLayout(new BoxLayout(desktopShortcutPanel, BoxLayout.X_AXIS));
+		desktopShortcutPanel.add(desktopShortcutCheckBox);
+		desktopShortcutPanel.setBorder(BorderFactory.createEmptyBorder(20,0,20,0));
+		
+		JLabel blank5 = new JLabel("                                                                    ");
+		
+		hbDesktopShortcut.add(desktopShortcutPanel);
+		hbDesktopShortcut.add(blank5);
 		
 		JPanel buttonPanel = new JPanel();
 		buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.X_AXIS));
@@ -258,6 +271,7 @@ public class Installer  extends JFrame {
 		vb.add(hbDirectory);
 		vb.add(hbNewFolderCheck);
 		vb.add(hbNewFolder);
+		vb.add(hbDesktopShortcut);
 		vb.add(hbButton);
 		vb.add(hbInstallingLabel);
 		add(vb);
@@ -298,11 +312,7 @@ public class Installer  extends JFrame {
 		
 		ActionListener okButtonActionListener = new ActionListener() {
 			public void actionPerformed(ActionEvent prodActionEvent) {
-				install();
-//				if (install()) {
-//					dotCount = 0;
-//					timer.start();										
-//				}				
+				install();			
 			}
 		};
 		
@@ -381,10 +391,12 @@ public class Installer  extends JFrame {
 			timer.start();
 			try {
 				copyDirectory(sourceDir, destDir);
-				// create desktop shortcut
-				writeVBSScriptFile(destDir.getPath());
-				// from http://stackoverflow.com/questions/13586213/how-to-execute-vbs-script-in-java
-				Runtime.getRuntime().exec("wscript.exe " + "MOST.vbs");
+				if (desktopShortcutCheckBox.isSelected()) {
+					// create desktop shortcut
+					writeVBSScriptFile(destDir.getPath());
+					// from http://stackoverflow.com/questions/13586213/how-to-execute-vbs-script-in-java
+					Runtime.getRuntime().exec("wscript.exe " + "MOST.vbs");
+				}				
 				done = true;
 				return true;
 			} catch (IOException e) {
@@ -470,7 +482,7 @@ public class Installer  extends JFrame {
 		bfr.append("oShellLink.Description = \"Shortcut Script\"\n");
 		bfr.append("oShellLink.WorkingDirectory = \"" + path + "\"\n");
 		bfr.append("oShellLink.Save");
-		System.out.println(bfr.toString());
+		//System.out.println(bfr.toString());
 		try {
 			File file = new File("MOST.vbs");
 			writer = new BufferedWriter(new FileWriter(file));
@@ -499,7 +511,7 @@ public class Installer  extends JFrame {
 
 		Installer frame = new Installer();
 		frame.setIconImages(icons);
-		frame.setSize(400, 300);
+		frame.setSize(400, 370);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
