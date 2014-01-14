@@ -36,4 +36,9 @@ public class InstallerConstants {
 	public static final String DESKTOP_SHORTCUT_CHECK_BOX_LABEL = "Create Desktop Shortcut";
 	public static final String SHORTCUT_NAME = "MOST";
 	
+	public static final String GUROBI_LAUNCH_ERROR_TITLE = "Gurobi Setup Error";
+	public static final String GUROBI_LAUNCH_ERROR_MESSAGE = "Installation of MOST was successful\n" +
+			"An error occurred when trying to set up Gurobi.\n" +
+			"Please start MOST manually by double-clicking on MOST.exe\n or MOST desktop icon.";
+	
 }

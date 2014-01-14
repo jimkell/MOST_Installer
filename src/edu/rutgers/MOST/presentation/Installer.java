@@ -236,7 +236,6 @@ public class Installer  extends JFrame {
 		newFolderLabel.setLabelFor(newFolderField);
 
 		hbNewFolder.add(newFolderPanel);
-		//hbNewFolder.setAlignmentX(LEFT_ALIGNMENT);
 
 		JPanel newFolderFieldPanel = new JPanel();
 		newFolderFieldPanel.setLayout(new BoxLayout(newFolderFieldPanel, BoxLayout.X_AXIS));
@@ -341,20 +340,31 @@ public class Installer  extends JFrame {
 				// if MOST is installed in the same directory as a previous installation.
 				File f = new File(getDestinationDirectory() + "\\settings.xml");
 				if (f.exists()) {
-					//System.out.println(filename);
 					delete(getDestinationDirectory() + "\\settings.xml");						
 				}
 				try {
 					System.out.println(getDestinationDirectory());
 					createBatchFile(getDestinationDirectory());
 					//Runtime.getRuntime().exec(getDestinationDirectory() + "\\MOST.exe");
-					Runtime.getRuntime().exec("cmd /c c:\\MOST.bat");
-//					File f = new File("c:\\MOST.bat");
-//					if (f.exists()) {
-//						//System.out.println(filename);
-//						delete("c:\\MOST.bat");						
-//					}
+					File f2 = new File("c:\\MOST.bat");
+					if (f2.exists()) {
+						Runtime.getRuntime().exec("cmd /c c:\\MOST.bat");						
+					} else {
+						JOptionPane.showMessageDialog(null,                
+								InstallerConstants.GUROBI_LAUNCH_ERROR_TITLE,                
+								InstallerConstants.GUROBI_LAUNCH_ERROR_MESSAGE,                               
+								JOptionPane.ERROR_MESSAGE);
+					}
 				} catch (IOException e) {
+					JOptionPane.showMessageDialog(null,                
+							InstallerConstants.GUROBI_LAUNCH_ERROR_TITLE,                
+							InstallerConstants.GUROBI_LAUNCH_ERROR_MESSAGE,                               
+							JOptionPane.ERROR_MESSAGE);
+				} catch (Throwable t) {
+					JOptionPane.showMessageDialog(null,                
+							InstallerConstants.GUROBI_LAUNCH_ERROR_TITLE,                
+							InstallerConstants.GUROBI_LAUNCH_ERROR_MESSAGE,                               
+							JOptionPane.ERROR_MESSAGE);
 				}
 			}
 		}; 
@@ -629,29 +639,6 @@ public class Installer  extends JFrame {
 		frame.setDefaultCloseOperation(DO_NOTHING_ON_CLOSE);
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-	
-		
-		//File sourceDir = new File("C:\\MOST");
-//		File sourceDir = new File("dist");
-		//File destFile = new File("C:\\downloads\\MOST.jar");
-		//File dir = new File("C:\\downloads\\test");
-//		File destDir = new File("C:\\Program Files\\Rutgers\\MOST");
-//		if (!destDir.exists()) {
-//			destDir.mkdir();
-//		} else {
-//			System.out.println("Directory exists. Do you wish to install MOST in this directory?");
-//			File destFile = new File("C:\\downloads\\test\\MOST.jar");
-//			if (destFile.exists()) {
-//				System.out.println("File exists. Do you wish to overwrite the file?");
-//			}
-//		}
-//		File destDir = new File(textField.getText());
-//		File destDir = new File("C:\\Program Files\\Rutgers_MOST");
-//		copyDirectory(sourceDir, destDir);
-//		File destDir = new File("C:\\downloads\\test");
-//		File destFile = new File("C:\\downloads\\test\\MOST.jar");
-//		copyFile(sourceFile, destFile);
-		
 	}
 }
 
