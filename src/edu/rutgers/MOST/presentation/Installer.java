@@ -337,6 +337,13 @@ public class Installer  extends JFrame {
 			public void actionPerformed(ActionEvent prodActionEvent) {
 				setVisible(false);
 				dispose();
+				// Delete settings file if exists. This situation will definitely occur
+				// if MOST is installed in the same directory as a previous installation.
+				File f = new File(getDestinationDirectory() + "\\settings.xml");
+				if (f.exists()) {
+					//System.out.println(filename);
+					delete(getDestinationDirectory() + "\\settings.xml");						
+				}
 				try {
 					System.out.println(getDestinationDirectory());
 					createBatchFile(getDestinationDirectory());
